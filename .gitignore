@@ -1,6 +1,5 @@
 # Credentials
-irc_credentials.*
-mssql_credentials.*
+credentials.*
 
 # Windows image file caches
 Thumbs.db
