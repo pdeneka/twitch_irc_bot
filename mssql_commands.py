@@ -7,7 +7,10 @@ from time import gmtime, strftime
 #set_regular
 #interface Ban & Timeout w/ Twitch so bot commands affect Twitch Users
 
-CREDENTIALS = 'DRIVER={SQL Server};SERVER=' + credentials.SQL_SERVER + ';DATABASE=' + credentials.SQL_DATABASE + ';UID=' + credentials.SQL_USER_ID + ';PWD=' + credentials.SQL_PASSWORD
+CREDENTIALS = 'DRIVER={SQL Server};SERVER=' + credentials.SQL_SERVER + \
+              ';DATABASE=' + credentials.SQL_DATABASE + \
+              ';UID=' + credentials.SQL_USER_ID + \
+              ';PWD=' + credentials.SQL_PASSWORD
 
 #Card Commands
 def Get_Oracle_Text(card):
@@ -16,7 +19,10 @@ def Get_Oracle_Text(card):
  cursor.execute("SELECT Oracle_Text FROM python_Oracle WHERE lower(Card_Name) = ?", card)
  row = cursor.fetchone()
  connection.close
- return row.Oracle_Text
+ if(row == None):
+  return "Does not exist in the database at this time."
+ else:
+  return row.Oracle_Text
 
 #User Commands
 def Add_User(user):
@@ -36,18 +42,26 @@ def Add_User(user):
  connection.close
 
 def Add_Twitch_Follower(user):
+ if(Is_Twitch_Follower(user) == False):
+  connection = pyodbc.connect(CREDENTIALS)
+  cursor = connection.cursor()
+  cursor.execute("INSERT INTO Twitch_Users (twitch_user_account, real_name, Skype, Security_ID, Last_Seen) VALUES (?, '', '', 1, ?)", user, strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+  cursor.commit()
+  cursor.close()
+  return True
+ else:
+  return False
+
+def Is_Twitch_Follower(user):
  connection = pyodbc.connect(CREDENTIALS)
  cursor = connection.cursor()
  cursor.execute("SELECT count(*) AS cnt FROM Twitch_Users WHERE twitch_user_account = ?", user)
  row = cursor.fetchone()
- if(row.cnt < 1):
-  cursor.execute("INSERT INTO Twitch_Users (twitch_user_account, real_name, Skype, Security_ID, Last_Seen) VALUES (?, "", "", 1, GETTIME())", user)
-  cursor.commit()
-  cursor.close()
-  print "Added user: " + user
+ if(row.cnt >= 1):
+  return True
  else:
-  print "User " + user + " already exists."
-
+  return False
+  
 def Get_Twitch_User_ID(user):
  connection = pyodbc.connect(CREDENTIALS)
  cursor = connection.cursor()

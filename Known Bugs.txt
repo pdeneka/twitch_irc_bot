@@ -1,0 +1,4 @@
+* 2015-08-31 Some cards intentionally unavailable
+* 2015-09-03 Some cards (Wave-Wing Elemental) unintentially unavailable
+* Update_Twitch_Followers hangs the IRC bot until completion.
+	* Workaround - get latest followers first until not new

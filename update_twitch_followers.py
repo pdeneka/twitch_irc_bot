@@ -1,5 +1,6 @@
 import credentials
 import json
+import mssql_commands
 import pprint
 import requests
 
@@ -14,6 +15,7 @@ Channel = credentials.TWITCH_CHANNEL
 Direction = 'DESC' #or ASC
 Limit = "1"
 Offset = "0"
+DEBUG = True
 
 r = requests.get('https://api.twitch.tv/kraken/channels/' + Channel + \
                  '/follows?direction=' + Direction + '&limit=' + Limit + \
@@ -54,16 +56,25 @@ def Get_Follower_Twich_Account_Name(Channel, Limit, Direction, Page_Offset):
  data = json.dumps(r.json())
  user = data.split('https://api.twitch.tv/kraken/users/')[1]
  user = user.split('/follows/channels/' + Channel)[0]
- print '************************************************************'
- print Output('Status Code: ' + str(r.status_code))
- print Output('Headers:     ' + r.headers['content-type'])
- print Output('Encoding:    ' + r.encoding)
- print Output('Followers:   ' + str(total_followers))
- print Output('User #:      ' + str(Page_Offset))
- print Output('Account:     ' + str(user))
- print '************************************************************'
+
+ if(DEBUG):
+  print '************************************************************'
+  print Output('Status Code: ' + str(r.status_code))
+  print Output('Headers:     ' + r.headers['content-type'])
+  print Output('Encoding:    ' + r.encoding)
+  print Output('Followers:   ' + str(total_followers))
+  print Output('User #:      ' + str(Page_Offset))
+  print Output('Account:     ' + str(user))
+  print '************************************************************'
 
  return user
 
 def Confirm_Account_Following(Channel):
  print 'Confirm_Account_Following(Channel) Not yet implemented'
+
+for c in range(Get_Follower_Count(Channel)+1, 0):
+ follower = Get_Follower_Twich_Account_Name(Channel, 1, 'DESC', c)
+ found = mssql_commands.Add_Twitch_Follower(follower)
+ if(found==True):
+  break
+  
