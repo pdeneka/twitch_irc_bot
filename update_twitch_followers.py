@@ -15,7 +15,7 @@ Channel = credentials.TWITCH_CHANNEL
 Direction = 'DESC' #or ASC
 Limit = "1"
 Offset = "0"
-DEBUG = True
+DEBUG = credentials.DEBUG
 
 r = requests.get('https://api.twitch.tv/kraken/channels/' + Channel + \
                  '/follows?direction=' + Direction + '&limit=' + Limit + \

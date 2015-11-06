@@ -69,9 +69,30 @@ def Get_Twitch_User_ID(user):
  row = cursor.fetchone()
  connection.close
  return row.id
- #if not exist, add to database
- #if(row.id == -500):
-  #Add_User(user)
+
+
+def Get_WordPress_Decklist(name):
+ connection = pyodbc.connect(CREDENTIALS)
+ cursor = connection.cursor()
+ cursor.execute("SELECT wordpress_url FROM WordPress_Decklists WHERE name = ?", name)
+ row = cursor.fetchone()
+ connection.close
+ try:
+  return row.wordpress_url
+ except:
+  return "Deck \"" + name + "\" not found.  Please use !decklists for a list of available decks."
+
+def Get_Decklists():
+ connection = pyodbc.connect(CREDENTIALS)
+ cursor = connection.cursor()
+ cursor.execute("SELECT name FROM WordPress_Decklists")
+ rows = cursor.fetchall()
+ decklists = ""
+ for row in rows:
+  decklists = decklists + row.name + ', '
+ connection.close
+ decklists = "Deck lists available: " + decklists[:-2]
+ return decklists
 
 def Revoke_Privileges(user_making_request, target_user):
  Get_User_Security_Level(user_making_request)
