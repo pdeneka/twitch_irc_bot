@@ -33,12 +33,11 @@ def Add_User(user):
  if(row.cnt < 1):
   cursor.execute("INSERT INTO Twitch_Users (twitch_user_account) VALUES(?)", user)
   cursor.commit()
-  cursor.execute("SELECT count(*) AS cnt FROM Twitch_Users WHERE twitch_user_account = ?", user)
-  row = cursor.fetchone()
-  if(row.cnt == 1):
-   print "Added user: ", user
-  else:
-   print "User " + user + " already exists."
+  print "Added user: " + user
+ cursor.execute("SELECT count(*) AS cnt FROM Twitch_Users WHERE twitch_user_account = ?", user)
+ row = cursor.fetchone()
+ if(row.cnt >= 1):
+  print  "Added user: " + user + ", confirmed."
  connection.close
 
 def Add_Twitch_Follower(user):
@@ -70,7 +69,6 @@ def Get_Twitch_User_ID(user):
  connection.close
  return row.id
 
-
 def Get_WordPress_Decklist(name):
  connection = pyodbc.connect(CREDENTIALS)
  cursor = connection.cursor()
@@ -80,7 +78,7 @@ def Get_WordPress_Decklist(name):
  try:
   return row.wordpress_url
  except:
-  return "Deck \"" + name + "\" not found.  Please use !decklists for a list of available decks."
+  return -1
 
 def Get_Decklists():
  connection = pyodbc.connect(CREDENTIALS)

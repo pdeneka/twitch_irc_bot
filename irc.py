@@ -12,7 +12,9 @@ import twitch_commands
 import wordpress_commands as wordpress
 from time import gmtime, strftime
 
-Running = True
+RUNNING = True
+SELF_CHECK = False
+FORMATTER_LENGTH = 120
 channel = credentials.IRC_CHANNEL
 server = credentials.IRC_HOST
 minutes_modulator = 10
@@ -36,12 +38,18 @@ def Send_message(message):
 
 def Terminal(message):
  message = message.replace('\n','').replace('\r','').strip()
- print(strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ": " + message)
+ now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+ message = now + ": " + message
+ while(len(message) > FORMATTER_LENGTH):
+  i = message[:FORMATTER_LENGTH]
+  print message[0:FORMATTER_LENGTH]
+  message = (" "*len(str(now))) + "  " + message[FORMATTER_LENGTH:len(message)]
+ print message
      
 Send_message("I have returned!")
 
-while(Running):
- try:
+while(RUNNING):
+ #try:
   ircmsg = s.recv(1024).strip('\r\n')
   if (ircmsg != ""):
    if (ircmsg.startswith("PING :tmi.twitch.tv")):
@@ -75,12 +83,16 @@ while(Running):
       #subprocess.Popen(["C:\Python27\Lib\idlelib\idle.pyw", "update_twitch_followers.py"], creationflags=DETACHED_PROCESS)
       os.system('python update_twitch_followers.py')
 
-     elif (ircmsg.find(":!decklists") != -1):
+     elif (ircmsg.find(":!decklist") != -1):
       Send_message(mssql_commands.Get_Decklists())
      
      elif (ircmsg.find(":!deck") != -1):
       deck_name = ircmsg.split(":!deck ")[1]
-      Send_message("@" + username + " Deck \"" + deck_name + "\": " + Get_WordPress_Decklist(deck_name))
+      deck_url = mssql_commands.Get_WordPress_Decklist(deck_name)
+      if(deck_url != -1):
+       Send_message("@" + username + " Deck \"" + deck_name + "\": " + deck_url)
+      else:
+       Send_message("@" + username + "Deck \"" + deck_name + "\" not found.  Please use !decklists for a list of available decks.")
      
      elif (ircmsg.find(":!article") != -1):
       Send_message("New article up! Check it out at: " + wordpress.Get_Last_Article())
@@ -98,5 +110,5 @@ while(Running):
       Send_message("All praise Craig in his majestic glory!")
       #craig = mssql_commands.Get_Total_Craigs()
       #Send_message("Craig has deemed us worthy of his presence ? times", craig)
- except:
-  print "Something broke."
+ #except:
+  #print "Something broke."
