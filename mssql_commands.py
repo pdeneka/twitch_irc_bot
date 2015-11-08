@@ -78,19 +78,22 @@ def Get_WordPress_Decklist(name):
  try:
   return row.wordpress_url
  except:
-  return -1
+  return "-1"
 
 def Get_Decklists():
  connection = pyodbc.connect(CREDENTIALS)
  cursor = connection.cursor()
  cursor.execute("SELECT name FROM WordPress_Decklists")
  rows = cursor.fetchall()
- decklists = ""
- for row in rows:
-  decklists = decklists + row.name + ', '
  connection.close
- decklists = "Deck lists available: " + decklists[:-2]
- return decklists
+ try:
+  decklists = ""
+  for row in rows:
+   decklists = decklists + row.name + ', '
+  decklists = "Deck lists available: " + decklists[:-2]
+  return decklists
+ except:
+  return "-1"
 
 def Revoke_Privileges(user_making_request, target_user):
  Get_User_Security_Level(user_making_request)

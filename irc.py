@@ -12,6 +12,8 @@ import twitch_commands
 import wordpress_commands as wordpress
 from time import gmtime, strftime
 
+#Add !roll d#
+
 RUNNING = True
 SELF_CHECK = False
 FORMATTER_LENGTH = 120
@@ -25,7 +27,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='[%(levelname)s] (%(threadName)-10s) %(message)s',
                     )
 
-
+#begin session
 s = socket.socket()
 s.connect((server, credentials.IRC_PORT))
 s.send("PASS " + credentials.IRC_OAUTH_PASSWORD + "\r\n")
@@ -41,9 +43,11 @@ def Terminal(message):
  now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
  message = now + ": " + message
  while(len(message) > FORMATTER_LENGTH):
-  i = message[:FORMATTER_LENGTH]
-  print message[0:FORMATTER_LENGTH]
-  message = (" "*len(str(now))) + "  " + message[FORMATTER_LENGTH:len(message)]
+  for n in range(0, FORMATTER_LENGTH):
+   if(message[FORMATTER_LENGTH-n] == " "):
+    break
+  print message[0:FORMATTER_LENGTH-n]
+  message = (" "*len(str(now))) + "  " + message[FORMATTER_LENGTH-n:len(message)]
  print message
      
 Send_message("I have returned!")
@@ -73,6 +77,7 @@ while(RUNNING):
       Send_message("@" + username + " " + card + ": " + mssql_commands.Get_Oracle_Text(card))
      
      elif ((ircmsg.find(":!quit") != -1) and (username == channel)):
+      #end session
       os._exit(0)
      
      elif ((ircmsg.find(":!restart") != -1) and (username == channel)):

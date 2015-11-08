@@ -18,7 +18,5 @@ def Get_Last_Article():
  except:
   return "-1"
 
-
-
 def Get_Article_with_Tags():
  print "wordpress_commands.Get_Article_with_Tags() is not yet implemented."
